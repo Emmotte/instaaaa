@@ -1,0 +1,5 @@
+{
+  "name": "Instagram Monitor UI",
+  "description": "A web interface to configure and run an Instagram monitoring tool. This UI allows users to set credentials, define target accounts, select data to fetch and download, and view simulated results and logs.",
+  "requestFramePermissions": []
+}
