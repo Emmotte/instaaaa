@@ -9,6 +9,7 @@ interface ConfigFormProps {
   onRun: () => void;
   onReset: () => void;
   isRunning: boolean;
+  pyodideState: 'loading' | 'ready' | 'error';
 }
 
 const CollapsibleSection: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean }> = ({ title, icon, children, defaultOpen = false }) => (
@@ -131,11 +132,26 @@ const NotificationManager: React.FC = () => {
 };
 
 
-export const ConfigForm: React.FC<ConfigFormProps> = ({ config, setConfig, onRun, onReset, isRunning }) => {
+export const ConfigForm: React.FC<ConfigFormProps> = ({ config, setConfig, onRun, onReset, isRunning, pyodideState }) => {
     const handleChange = <T extends keyof Config,>(key: T, value: Config[T]) => {
         setConfig(prev => ({ ...prev, [key]: value }));
     };
     
+    const getButtonState = () => {
+        if (pyodideState === 'loading') {
+            return { text: 'Loading Python...', disabled: true, icon: <LoaderIcon /> };
+        }
+        if (pyodideState === 'error') {
+            return { text: 'Python Failed', disabled: true, icon: <XIcon /> };
+        }
+        if (isRunning) {
+            return { text: 'Running...', disabled: true, icon: <LoaderIcon /> };
+        }
+        return { text: 'Start Monitoring', disabled: false, icon: <PlayIcon /> };
+    };
+
+    const buttonState = getButtonState();
+
     return (
         <div className="space-y-6">
             <CollapsibleSection icon={<UsersIcon />} title="Authentication & Targets" defaultOpen>
@@ -269,11 +285,11 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, setConfig, onRun
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-700">
                 <button
                     onClick={onRun}
-                    disabled={isRunning}
+                    disabled={buttonState.disabled}
                     className="w-full flex items-center justify-center bg-sky-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-500 transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
                 >
-                    {isRunning ? <LoaderIcon /> : <PlayIcon />}
-                    <span className="ml-2">{isRunning ? 'Running...' : 'Start Monitoring'}</span>
+                    {buttonState.icon}
+                    <span className="ml-2">{buttonState.text}</span>
                 </button>
                 <button
                     onClick={onReset}

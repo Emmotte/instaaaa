@@ -88,4 +88,6 @@ export interface Results {
   notFollowingYouBack: { target:string; users: string[] };
   mutualFollowing: { target:string; users: string[] };
   downloadedMediaCount: number;
+  outputZipBase64: string;
+  generatedFiles: string[];
 }
