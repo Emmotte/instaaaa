@@ -4,7 +4,7 @@ import { ResultsPanel } from './components/ResultsPanel';
 import { Header } from './components/Header';
 import type { Config, Results } from './types';
 import { LogLevel } from './types';
-import { DEFAULT_CONFIG, MOCK_RESULTS, MOCK_LOG_STREAM } from './constants';
+import { DEFAULT_CONFIG, generateMockResults, generateMockLogStream } from './constants';
 
 export default function App() {
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
@@ -23,6 +23,9 @@ export default function App() {
     setResults(null);
     setLogs([]);
 
+    const MOCK_LOG_STREAM = generateMockLogStream(config);
+    const MOCK_RESULTS = generateMockResults(config);
+
     let logIndex = 0;
     const interval = setInterval(() => {
       if (logIndex < MOCK_LOG_STREAM.length) {
@@ -33,7 +36,7 @@ export default function App() {
         setResults(MOCK_RESULTS);
         setIsRunning(false);
 
-        const hasError = MOCK_LOG_STREAM.some(l => l.startsWith('[ERROR]'));
+        const hasError = MOCK_LOG_STREAM.some(l => l && l.startsWith('[ERROR]'));
         if (hasError && config.errorNotification) {
           sendNotification('Instagram Monitor Error', 'An error occurred during the run. Check logs for details.');
         } else if (!hasError && config.statusNotification) {
@@ -41,7 +44,7 @@ export default function App() {
         }
       }
     }, 400);
-  }, [config.errorNotification, config.statusNotification]);
+  }, [config]);
 
   const handleReset = useCallback(() => {
     setConfig(DEFAULT_CONFIG);

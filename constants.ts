@@ -75,38 +75,48 @@ export const DEFAULT_CONFIG: Config = {
   checkInternetTimeout: 5,
 };
 
-export const MOCK_RESULTS: Results = {
-  newFollowers: { target: 'instagram', users: ['user_a', 'user_b', 'user_c', 'user_d'] },
-  newFollowing: { target: 'instagram', users: ['user_e', 'user_f'] },
-  unfollowedBy: { target: 'instagram', users: ['user_g'] },
-  unfollowedYou: { target: 'instagram', users: ['user_h', 'user_i'] },
-  notFollowingYouBack: { target: 'instagram', users: ['user_j', 'user_k', 'user_l'] },
-  mutualFollowing: { target: 'instagram', users: ['user_m', 'user_n', 'user_o', 'user_p', 'user_q', 'user_r', 'user_s', 'user_t'] },
-  downloadedMediaCount: 15,
+export const generateMockResults = (config: Config): Results => {
+    const target = config.targets[0] || 'no_target_set';
+    const generateUsers = (prefix: string, count: number) => Array.from({ length: count }, (_, i) => `${prefix}_${target}_${String.fromCharCode(97 + i)}`);
+
+    return {
+        newFollowers: { target, users: generateUsers('new_follower', 4) },
+        newFollowing: { target, users: generateUsers('new_following', 2) },
+        unfollowedBy: { target, users: generateUsers('unfollowed_by', 1) },
+        unfollowedYou: { target, users: generateUsers('unfollowed_you', 2) },
+        notFollowingYouBack: { target, users: generateUsers('not_following_back', 3) },
+        mutualFollowing: { target, users: generateUsers('mutual', 8) },
+        downloadedMediaCount: 15,
+    };
 };
 
-export const MOCK_LOG_STREAM: string[] = [
-    "[INFO] Starting Instagram Monitor...",
-    "[INFO] Logging in as user 'your_username'...",
-    "[SUCCESS] Login successful.",
-    "[INFO] Processing target: 'instagram'",
-    "[INFO] Fetching followers for 'instagram'...",
-    "[INFO] Fetched 500 followers.",
-    "[INFO] Fetching following for 'instagram'...",
-    "[INFO] Fetched 100 following.",
-    "[WARNING] Rate limit approaching. Applying random delay.",
-    "[INFO] Comparing follower lists...",
-    "[INFO] Found 4 new followers.",
-    "[INFO] Found 2 users who unfollowed you.",
-    "[INFO] Downloading profile picture for 'instagram'...",
-    "[SUCCESS] Profile picture downloaded.",
-    "[INFO] Downloading stories for 'instagram'...",
-    "[INFO] Found 3 new stories. Downloading...",
-    "[ERROR] Failed to download story from user_x. Media may be expired.",
-    "[SUCCESS] Stories downloaded.",
-    "[INFO] Downloading posts for 'instagram'...",
-    "[INFO] Found 12 new posts. Downloading...",
-    "[SUCCESS] Posts downloaded.",
-    "[INFO] Writing results to output files...",
-    "[SUCCESS] Monitoring complete."
-];
+export const generateMockLogStream = (config: Config): (string | undefined)[] => {
+    const username = config.username || 'your_username';
+    const mainTarget = config.targets[0] || 'no_target_set';
+
+    return [
+        "[INFO] Starting Instagram Monitor...",
+        `[INFO] Logging in as user '${username}'...`,
+        "[SUCCESS] Login successful.",
+        ...config.targets.map(target => `[INFO] Processing target: '${target}'`),
+        `[INFO] Fetching followers for '${mainTarget}'...`,
+        "[INFO] Fetched 500 followers.",
+        `[INFO] Fetching following for '${mainTarget}'...`,
+        "[INFO] Fetched 100 following.",
+        "[WARNING] Rate limit approaching. Applying random delay.",
+        "[INFO] Comparing follower lists...",
+        "[INFO] Found 4 new followers.",
+        "[INFO] Found 2 users who unfollowed you.",
+        `[INFO] Downloading profile picture for '${mainTarget}'...`,
+        "[SUCCESS] Profile picture downloaded.",
+        `[INFO] Downloading stories for '${mainTarget}'...`,
+        "[INFO] Found 3 new stories. Downloading...",
+        "[ERROR] Failed to download story from user_x. Media may be expired.",
+        "[SUCCESS] Stories downloaded.",
+        `[INFO] Downloading posts for '${mainTarget}'...`,
+        "[INFO] Found 12 new posts. Downloading...",
+        "[SUCCESS] Posts downloaded.",
+        "[INFO] Writing results to output files...",
+        "[SUCCESS] Monitoring complete."
+    ];
+};

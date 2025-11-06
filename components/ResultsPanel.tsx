@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { Results } from '../types';
 import { LoaderIcon } from './icons';
@@ -97,6 +96,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, logs, isRun
 
 const LogsTab: React.FC<{ logs: string[]; logContainerRef: React.RefObject<HTMLDivElement> }> = ({ logs, logContainerRef }) => {
     const getLogColor = (log: string) => {
+        if (!log) return 'text-slate-400';
         if (log.startsWith('[SUCCESS]')) return 'text-green-400';
         if (log.startsWith('[ERROR]')) return 'text-red-400';
         if (log.startsWith('[WARNING]')) return 'text-yellow-400';
@@ -106,10 +106,12 @@ const LogsTab: React.FC<{ logs: string[]; logContainerRef: React.RefObject<HTMLD
     return (
         <div ref={logContainerRef} className="bg-black/50 rounded-md h-full p-4 overflow-y-auto font-mono text-sm">
             {logs.map((log, index) => (
-                <p key={index} className={getLogColor(log)}>
-                  <span className="text-slate-500 mr-2 select-none">{String(index + 1).padStart(3, ' ')}</span>
-                  {log}
-                </p>
+                log ? (
+                    <p key={index} className={getLogColor(log)}>
+                      <span className="text-slate-500 mr-2 select-none">{String(index + 1).padStart(3, ' ')}</span>
+                      {log}
+                    </p>
+                ) : null
             ))}
         </div>
     );
